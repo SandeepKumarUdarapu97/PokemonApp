@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 import HomeScreen  from '../screens/HomeScreen';
@@ -7,8 +7,11 @@ import LoginScreen from '../screens/LoginScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 
 const Stack = createStackNavigator();
+interface AppNavigatorProps {
+  navigationRef: React.RefObject<NavigationContainerRef<any>>;
+}
 
-const AppNavigator: React.FC = () => {
+const AppNavigator: React.FC<AppNavigatorProps> = ({ navigationRef }) => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [initializing, setInitializing] = useState(true);
 
@@ -23,7 +26,7 @@ const AppNavigator: React.FC = () => {
   if (initializing) return null;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator>
         {user ? (
           <>

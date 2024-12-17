@@ -8,6 +8,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import 'react-native-gesture-handler';
+import { NavigationContainerRef } from '@react-navigation/native';
+import { configureLocalNotifications, requestNotificationPermission, setNavigationRef, setupNotificationListeners } from './src/services/notificationService';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDs8b8erWIxigwmiHtrwvqjOi0eVgXIN-o',
@@ -21,9 +23,18 @@ const firebaseConfig = {
 
 const App: React.FC = () => {
   const [isFirebaseInitialized, setIsFirebaseInitialized] = useState(false);
+  const navigationRef = React.useRef<NavigationContainerRef<any>>(null);
 
   useEffect(() => {
-    // Initialize Firebase
+    configureLocalNotifications()
+    requestNotificationPermission();
+    setupNotificationListeners(navigationRef);
+    if (navigationRef.current) {
+      setNavigationRef(navigationRef.current);
+    }
+  }, []);
+
+  useEffect(() => {
     const initializeFirebase = async () => {
       try {
         if (!firebase.apps.length) {
@@ -64,7 +75,7 @@ const App: React.FC = () => {
           }
           persistor={persistor}
         >
-          <AppNavigator />
+          <AppNavigator navigationRef={navigationRef}/>
         </PersistGate>
       </Provider>
     </QueryClientProvider>
