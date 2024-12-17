@@ -11,7 +11,7 @@ interface PokemonDetails {
 }
 
 const DetailsScreen: React.FC = ({route}) => {
-  const {url} = route.params; // URL passed from HomeScreen
+  const {url} = route.params;
   const [pokemon, setPokemon] = useState<PokemonDetails | null>(null);
   const [loading, setLoading] = useState(true);
 

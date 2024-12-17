@@ -2,21 +2,16 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistReducer, persistStore } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers } from 'redux';
-import thunk from 'redux-thunk';
-
-// Import reducers
 import authReducer from './slices/authSlice';
 import buttonReducer from './slices/buttonSlice';
 import pokemonReducer from './slices/pokemonSlice';
 
-// Redux Persist Configuration
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['auth', 'buttons'], // Persist only these reducers
+  whitelist: ['auth', 'buttons'],
 };
 
-// Combine reducers
 const rootReducer = combineReducers({
   auth: authReducer,
   buttons: buttonReducer,

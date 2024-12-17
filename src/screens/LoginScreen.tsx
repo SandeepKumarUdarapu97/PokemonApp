@@ -1,14 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import {signInWithGoogle, UserInfo} from '../services/authServices';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {useDispatch} from 'react-redux';
 import {login} from '../redux/slices/authSlice';
 import {getHeight, getWidth, normalize} from '../utils';

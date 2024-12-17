@@ -8,8 +8,10 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import 'react-native-gesture-handler';
-import { NavigationContainerRef } from '@react-navigation/native';
-import { configureLocalNotifications, requestNotificationPermission, setNavigationRef, setupNotificationListeners } from './src/services/notificationService';
+import {
+  configureLocalNotifications,
+  requestNotificationPermission,
+} from './src/services/notificationService';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDs8b8erWIxigwmiHtrwvqjOi0eVgXIN-o',
@@ -23,30 +25,20 @@ const firebaseConfig = {
 
 const App: React.FC = () => {
   const [isFirebaseInitialized, setIsFirebaseInitialized] = useState(false);
-  const navigationRef = React.useRef<NavigationContainerRef<any>>(null);
-
   useEffect(() => {
-    configureLocalNotifications()
+    configureLocalNotifications();
     requestNotificationPermission();
-    setupNotificationListeners(navigationRef);
-    if (navigationRef.current) {
-      setNavigationRef(navigationRef.current);
-    }
   }, []);
 
   useEffect(() => {
     const initializeFirebase = async () => {
-      try {
-        if (!firebase.apps.length) {
-          await firebase.initializeApp(firebaseConfig);
-        }
-        setIsFirebaseInitialized(true);
-      } catch (error) {
-        console.error('Firebase initialization error:', error.message);
+      if (!firebase.apps.length) {
+        await firebase.initializeApp(firebaseConfig);
       }
+      setIsFirebaseInitialized(true);
     };
-
     initializeFirebase();
+
     GoogleSignin.configure({
       webClientId: '622892887627-jeto2n45bvgavl0s7ufnoldgfnom9pdk.apps.googleusercontent.com',
     });
@@ -66,16 +58,8 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <PersistGate
-          loading={
-            <View style={styles.container}>
-              <ActivityIndicator size="large" color="#0000ff" />
-              <Text>Rehydrating State...</Text>
-            </View>
-          }
-          persistor={persistor}
-        >
-          <AppNavigator navigationRef={navigationRef}/>
+        <PersistGate persistor={persistor}>
+          <AppNavigator/>
         </PersistGate>
       </Provider>
     </QueryClientProvider>

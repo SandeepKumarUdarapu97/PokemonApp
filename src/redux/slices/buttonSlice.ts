@@ -25,9 +25,14 @@ const buttonSlice = createSlice({
     toggleSettings: (state) => {
       state.settings = !state.settings;
     },
+    reset: (state) =>{
+      state.catchPokemon = false;
+      state.viewTeam = false;
+      state.settings = false;
+    }
   },
 });
 
-export const { toggleCatchPokemon, toggleViewTeam, toggleSettings } =
+export const { toggleCatchPokemon, toggleViewTeam, toggleSettings,reset } =
   buttonSlice.actions;
 export default buttonSlice.reducer;

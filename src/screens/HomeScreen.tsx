@@ -1,8 +1,7 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
-  Button,
   StyleSheet,
   Image,
   FlatList,
@@ -15,13 +14,15 @@ import {
   toggleCatchPokemon,
   toggleViewTeam,
   toggleSettings,
+  reset,
 } from '../redux/slices/buttonSlice';
 import {RootState} from '../redux/store';
 import {signOut} from '../services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import queryString from 'query-string';
-import { getHeight, getWidth, normalize } from '../utils';
+import {getHeight, getWidth, normalize} from '../utils';
+import {logout, updateNotificationData} from '../redux/slices/authSlice';
 
 interface PokemonResponse {
   next: string | null;
@@ -39,6 +40,9 @@ const HomeScreen: React.FC = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const buttons = useSelector((state: RootState) => state.buttons);
+  const notificationData = useSelector(
+    (state: RootState) => state.auth.notificationData,
+  );
   const user = useSelector((state: RootState) => state.auth.user);
 
   const {data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage} =
@@ -54,9 +58,19 @@ const HomeScreen: React.FC = () => {
       },
     });
 
+  useEffect(() => {
+    if (notificationData) {
+      navigation.navigate('Details', {url: notificationData.url});
+      dispatch(updateNotificationData(null));
+    }
+  }, [notificationData]);
+
   const handleSignOut = async () => {
     try {
       await signOut();
+      dispatch(logout())
+      dispatch(reset());
+      
     } catch (error) {
       console.error('Sign-Out Failed:', error);
     }
@@ -66,24 +80,26 @@ const HomeScreen: React.FC = () => {
     console.log(item);
 
     return (
-        <TouchableOpacity style={{
-            marginBottom: getHeight(1),
-            paddingVertical: getHeight(0.5),
-            backgroundColor: '#ca705d',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: getWidth(1)
+      <TouchableOpacity
+        style={{
+          marginBottom: getHeight(1),
+          paddingVertical: getHeight(0.5),
+          backgroundColor: '#ca705d',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: getWidth(1),
         }}
         onPress={() => navigation.navigate('Details', {url: item.url})}>
-            <Text style={{
-                color: 'white',
-                textAlign: 'center',
-                fontWeight:'600',
-                fontSize: normalize(16)
-            }}>
-                {item.name}
-            </Text>
-        </TouchableOpacity>
+        <Text
+          style={{
+            color: 'white',
+            textAlign: 'center',
+            fontWeight: '600',
+            fontSize: normalize(16),
+          }}>
+          {item.name}
+        </Text>
+      </TouchableOpacity>
     );
   };
 
@@ -146,7 +162,9 @@ const HomeScreen: React.FC = () => {
           </Text>
         </View>
       </View>
-      <TouchableOpacity style={styles.logoutButton} onPress={()=> handleSignOut()} >
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() => handleSignOut()}>
         <Text style={styles.logoutText}>Log Out</Text>
       </TouchableOpacity>
 
@@ -176,7 +194,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: getHeight(2),
-    paddingTop: getHeight(2)
+    paddingTop: getHeight(2),
   },
   userInfo: {
     alignItems: 'center',
@@ -201,7 +219,7 @@ const styles = StyleSheet.create({
   buttonState: {
     fontSize: normalize(12),
     marginVertical: getHeight(0.25),
-    fontWeight:'400'
+    fontWeight: '400',
   },
   pokemonListContainer: {
     flex: 1,
@@ -215,12 +233,12 @@ const styles = StyleSheet.create({
   logoutButton: {
     marginTop: getHeight(1),
     borderRadius: getWidth(1),
-    backgroundColor:'#c6a49d',
-    alignItems:'center',
-    justifyContent:'center',
-    padding:getHeight(1)
+    backgroundColor: '#c6a49d',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: getHeight(1),
   },
-  logoutText: {fontSize: normalize(14),color:'white',fontWeight:'400'}
+  logoutText: {fontSize: normalize(14), color: 'white', fontWeight: '400'},
 });
 
 export default HomeScreen;

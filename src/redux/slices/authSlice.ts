@@ -6,14 +6,20 @@ interface User {
   email: string | null;
 }
 
+interface NotificationData {
+  url : string
+}
+
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
+  notificationData: NotificationData | null
 }
 
 const initialState: AuthState = {
   isAuthenticated: false,
   user: null,
+  notificationData: null
 };
 
 const authSlice = createSlice({
@@ -27,9 +33,13 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
+      state.notificationData = null
+    },
+    updateNotificationData: (state, action: PayloadAction<NotificationData| null>) => {
+      state.notificationData = action.payload
     },
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { login, logout,updateNotificationData } = authSlice.actions;
 export default authSlice.reducer;
