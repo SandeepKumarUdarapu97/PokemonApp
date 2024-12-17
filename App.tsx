@@ -11,6 +11,7 @@ import 'react-native-gesture-handler';
 import {
   configureLocalNotifications,
   requestNotificationPermission,
+  requestNotificationPermissionforAndroid,
 } from './src/services/notificationService';
 
 const firebaseConfig = {
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   useEffect(() => {
     configureLocalNotifications();
     requestNotificationPermission();
+    requestNotificationPermissionforAndroid()
   }, []);
 
   useEffect(() => {
