@@ -2,6 +2,7 @@
 https://drive.google.com/file/d/16GL6CUos5YSgSDIo4DQx43puuSpckYe6/view?usp=drivesdk ---video
 
 npm i --legacy-peer-deps(some of the libraries have discripance at react version that's the reason for --legacy-peer-deps)
+
 npx react-native run-android (IOS wont' work becuase for the notifications we need developer account for APN certificates etc..)
 
 googleSign (you can check)
