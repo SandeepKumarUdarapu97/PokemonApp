@@ -1,117 +1,81 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState, useEffect } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import firebase from '@react-native-firebase/app';
+import AppNavigator from './src/navigation/AppNavigator';
+import { Provider } from 'react-redux';
+import { persistor, store } from './src/redux/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import 'react-native-gesture-handler';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+const firebaseConfig = {
+  apiKey: 'AIzaSyDs8b8erWIxigwmiHtrwvqjOi0eVgXIN-o',
+  authDomain: 'pokemonapp-f9f86.firebaseapp.com',
+  projectId: 'pokemonapp-f9f86',
+  storageBucket: 'pokemonapp-f9f86.appspot.com',
+  messagingSenderId: '622892887627',
+  appId: '1:622892887627:android:0db5cf8ebd63e2eb2427ce',
+  databaseURL: '',
+};
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const App: React.FC = () => {
+  const [isFirebaseInitialized, setIsFirebaseInitialized] = useState(false);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+  useEffect(() => {
+    // Initialize Firebase
+    const initializeFirebase = async () => {
+      try {
+        if (!firebase.apps.length) {
+          await firebase.initializeApp(firebaseConfig);
+        }
+        setIsFirebaseInitialized(true);
+      } catch (error) {
+        console.error('Firebase initialization error:', error.message);
+      }
+    };
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+    initializeFirebase();
+    GoogleSignin.configure({
+      webClientId: '622892887627-jeto2n45bvgavl0s7ufnoldgfnom9pdk.apps.googleusercontent.com',
+    });
+  }, []);
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const queryClient = new QueryClient();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  if (!isFirebaseInitialized) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text>Initializing Firebase...</Text>
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <PersistGate
+          loading={
+            <View style={styles.container}>
+              <ActivityIndicator size="large" color="#0000ff" />
+              <Text>Rehydrating State...</Text>
+            </View>
+          }
+          persistor={persistor}
+        >
+          <AppNavigator />
+        </PersistGate>
+      </Provider>
+    </QueryClientProvider>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
