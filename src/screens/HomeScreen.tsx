@@ -7,6 +7,8 @@ import {
   Image,
   FlatList,
   ActivityIndicator,
+  Switch,
+  TouchableOpacity,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {
@@ -19,6 +21,7 @@ import {signOut} from '../services/authServices';
 import {useNavigation} from '@react-navigation/native';
 import {useInfiniteQuery} from '@tanstack/react-query';
 import queryString from 'query-string';
+import { getHeight, getWidth, normalize } from '../utils';
 
 interface PokemonResponse {
   next: string | null;
@@ -61,13 +64,37 @@ const HomeScreen: React.FC = () => {
 
   const renderItem = ({item}: {item: {name: string; url: string}}) => {
     console.log(item);
-    
+
     return (
-      <Button
-        title={item.name}
-        onPress={() => navigation.navigate('Details', {url: item.url})}
-      />
+        <TouchableOpacity style={{
+            marginBottom: getHeight(1),
+            paddingVertical: getHeight(0.5),
+            backgroundColor: '#ca705d',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: getWidth(1)
+        }}
+        onPress={() => navigation.navigate('Details', {url: item.url})}>
+            <Text style={{
+                color: 'white',
+                textAlign: 'center',
+                fontWeight:'600',
+                fontSize: normalize(16)
+            }}>
+                {item.name}
+            </Text>
+        </TouchableOpacity>
     );
+  };
+
+  const toggleCatchPokeonSwitch = () => {
+    dispatch(toggleCatchPokemon());
+  };
+  const toggleViewTeamSwitch = () => {
+    dispatch(toggleViewTeam());
+  };
+  const toggleViewSettingsSwitch = () => {
+    dispatch(toggleSettings());
   };
 
   return (
@@ -82,33 +109,46 @@ const HomeScreen: React.FC = () => {
         </View>
       )}
       <View style={styles.buttonsContainer}>
-        <Text style={styles.buttonState}>
-          Catch Pokémon: {buttons.catchPokemon ? 'On' : 'Off'}
-        </Text>
-        <Button
-          title="Toggle Catch Pokémon"
-          onPress={() => dispatch(toggleCatchPokemon())}
-        />
-
-        <Text style={styles.buttonState}>
-          View Team: {buttons.viewTeam ? 'On' : 'Off'}
-        </Text>
-        <Button
-          title="Toggle View Team"
-          onPress={() => dispatch(toggleViewTeam())}
-        />
-
-        <Text style={styles.buttonState}>
-          Settings: {buttons.settings ? 'On' : 'Off'}
-        </Text>
-        <Button
-          title="Toggle Settings"
-          onPress={() => dispatch(toggleSettings())}
-        />
+        <View style={{alignItems: 'center'}}>
+          <Switch
+            trackColor={{false: '#767577', true: '#81b0ff'}}
+            thumbColor={buttons.catchPokemon ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleCatchPokeonSwitch}
+            value={buttons.catchPokemon}
+          />
+          <Text style={styles.buttonState}>
+            Catch Pokémon: {buttons.catchPokemon ? 'On' : 'Off'}
+          </Text>
+        </View>
+        <View style={{alignItems: 'center'}}>
+          <Switch
+            trackColor={{false: '#767577', true: '#81b0ff'}}
+            thumbColor={buttons.viewTeam ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleViewTeamSwitch}
+            value={buttons.viewTeam}
+          />
+          <Text style={styles.buttonState}>
+            View Team: {buttons.viewTeam ? 'On' : 'Off'}
+          </Text>
+        </View>
+        <View style={{alignItems: 'center'}}>
+          <Switch
+            trackColor={{false: '#767577', true: '#81b0ff'}}
+            thumbColor={buttons.settings ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleViewSettingsSwitch}
+            value={buttons.settings}
+          />
+          <Text style={styles.buttonState}>
+            Settings: {buttons.settings ? 'On' : 'Off'}
+          </Text>
+        </View>
       </View>
-      <View style={styles.logoutButton}>
-        <Button title="Log Out" onPress={handleSignOut} />
-      </View>
+      <TouchableOpacity style={styles.logoutButton} onPress={()=> handleSignOut()} >
+        <Text style={styles.logoutText}>Log Out</Text>
+      </TouchableOpacity>
 
       {/* Pokémon List */}
       <View style={styles.pokemonListContainer}>
@@ -135,41 +175,52 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: getHeight(2),
+    paddingTop: getHeight(2)
   },
   userInfo: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: getHeight(2),
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 8,
+    width: getWidth(20),
+    height: getWidth(20),
+    borderRadius: getWidth(15),
+    marginBottom: getHeight(1),
   },
   text: {
-    fontSize: 18,
+    fontSize: normalize(18),
     fontWeight: 'bold',
   },
   buttonsContainer: {
-    marginBottom: 16,
+    marginBottom: getHeight(2),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   buttonState: {
-    fontSize: 16,
-    marginVertical: 4,
+    fontSize: normalize(12),
+    marginVertical: getHeight(0.25),
+    fontWeight:'400'
   },
   pokemonListContainer: {
     flex: 1,
-    marginVertical: 16,
+    marginVertical: getHeight(2),
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: normalize(18),
+    fontWeight: '600',
     marginBottom: 8,
   },
   logoutButton: {
-    marginTop: 16,
+    marginTop: getHeight(1),
+    borderRadius: getWidth(1),
+    backgroundColor:'#c6a49d',
+    alignItems:'center',
+    justifyContent:'center',
+    padding:getHeight(1)
   },
+  logoutText: {fontSize: normalize(14),color:'white',fontWeight:'400'}
 });
 
 export default HomeScreen;

@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Button, StyleSheet, ActivityIndicator } from 'react-native';
-import { signInWithGoogle, UserInfo } from '../services/authServices';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { useDispatch } from 'react-redux';
-import { login } from '../redux/slices/authSlice';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import {signInWithGoogle, UserInfo} from '../services/authServices';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {useDispatch} from 'react-redux';
+import {login} from '../redux/slices/authSlice';
+import {getHeight, getWidth, normalize} from '../utils';
 
 const LoginScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +28,7 @@ const LoginScreen: React.FC = () => {
           displayName: loggedInUser.displayName,
           photoURL: loggedInUser.photoURL,
           email: loggedInUser.email,
-        })
+        }),
       );
     } catch (error) {
       console.error('Login Failed:', error);
@@ -38,7 +46,11 @@ const LoginScreen: React.FC = () => {
         <>
           <Text style={styles.text}>Login with Google</Text>
           {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
-          <Button title="Sign In with Google" onPress={handleGoogleSignIn} />
+          <TouchableOpacity
+            style={styles.signButton}
+            onPress={() => handleGoogleSignIn()}>
+            <Text style={styles.signText}>SignIn with google</Text>
+          </TouchableOpacity>
         </>
       )}
     </View>
@@ -50,17 +62,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: getHeight(2),
   },
   text: {
-    fontSize: 18,
-    marginBottom: 16,
+    fontSize: normalize(18),
+    marginBottom: getHeight(2),
   },
   errorText: {
     color: 'red',
-    fontSize: 14,
-    marginBottom: 16,
+    fontSize: normalize(12),
+    marginBottom: getHeight(2),
   },
+  signButton: {
+    borderRadius: getWidth(1),
+    backgroundColor: '#c6a49d',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: getHeight(1),
+  },
+  signText: {fontSize: normalize(14), color: 'white', fontWeight: '400'},
 });
 
 export default LoginScreen;
